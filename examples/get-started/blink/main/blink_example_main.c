@@ -16,10 +16,15 @@
 
 static const char *TAG = "example";
 
+int variable_grande[5000];
+int variabile_inicializada[5000] = {27};
+
 /* Use project configuration menu (idf.py menuconfig) to choose the GPIO to blink,
    or you can edit the following line and set a number here.
 */
 #define BLINK_GPIO CONFIG_BLINK_GPIO
+
+#define BUTTON_GPIO 9
 
 static uint8_t s_led_state = 0;
 
@@ -84,21 +89,32 @@ static void configure_led(void)
     gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
 }
 
+static void configure_button(void)
+{
+    ESP_LOGI(TAG, "Button configured!");
+    gpio_reset_pin(BUTTON_GPIO);
+    /* Set the GPIO as a push/pull output */
+    gpio_set_direction(BUTTON_GPIO, GPIO_MODE_INPUT);
+}
+
 #else
 #error "unsupported LED type"
 #endif
 
 void app_main(void)
 {
-
     /* Configure the peripheral according to the LED type */
     configure_led();
+    configure_button();
 
     while (1) {
+        s_led_state = !gpio_get_level(BUTTON_GPIO);
         ESP_LOGI(TAG, "Turning the LED %s!", s_led_state == true ? "ON" : "OFF");
+        variable_grande[4000] = 0;
+        variabile_inicializada[4500] = 1;
         blink_led();
         /* Toggle the LED state */
-        s_led_state = !s_led_state;
-        vTaskDelay(CONFIG_BLINK_PERIOD / portTICK_PERIOD_MS);
+        //vTaskDelay(CONFIG_BLINK_PERIOD / portTICK_PERIOD_MS);
+        
     }
 }
